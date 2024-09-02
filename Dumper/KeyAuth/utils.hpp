@@ -1,0 +1,51 @@
+#pragma once
+#include <filesystem> 
+#include <string> 
+#include <fstream>
+#include "skStr.h"
+#include "json.hpp"
+using json = nlohmann::json;
+bool FileExists(const std::string& filename) {
+	std::ifstream file(filename);
+	return file.good();
+}
+
+std::string ReadFromJson(std::string path, std::string section) 
+{
+	if (!FileExists(path))
+		return skCrypt("File Not Found").decrypt();
+	std::ifstream file(path);
+	json data = json::parse(file);
+	return data[section];
+}
+
+bool CheckIfJsonKeyExists(std::string path, std::string section) 
+{
+	if (!FileExists(path))
+		return skCrypt("File Not Found").decrypt();
+	std::ifstream file(path);
+	json data = json::parse(file);
+	return data.contains(section);
+}
+
+bool WriteToJson(std::string path, std::string name, std::string value, bool userpass, std::string name2, std::string value2) 
+{
+	json file;
+	if (!userpass) 
+	{
+		file[name] = value;
+	}
+	else
+	{
+		file[name] = value;
+		file[name2] = value2;
+	}
+
+	std::ofstream jsonfile(path, std::ios::out);
+	jsonfile << file;
+	jsonfile.close();
+	if (!FileExists(path))
+		return false;
+
+	return true;
+}
